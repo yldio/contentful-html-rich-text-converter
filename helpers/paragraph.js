@@ -34,11 +34,14 @@ const paragraph = (subContent, nodeType) => {
             brIndex = R.findIndex(R.propEq('nodeType', 'br'), R.last(subNodes));
         }
     }
+
+    subNodes = processSubNodes(subNodes, nodeType);
+
     newData = R.map((content) => ({
         data: {},
         content,
         nodeType: ["bold", "italic"].contains(nodeType) ? "paragraph" : nodeType,
-    }), processSubNodes(subNodes, nodeType));
+    }), subNodes);
 
     return newData;
 };
