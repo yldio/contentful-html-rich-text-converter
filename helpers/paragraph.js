@@ -35,7 +35,11 @@ const paragraph = (subContent, nodeType) => {
         }
     }
 
+    console.log(subNodes);
+
     subNodes = processSubNodes(subNodes, nodeType);
+
+    console.log(subNodes);
 
     newData = R.map((content) => ({
         data: {},
