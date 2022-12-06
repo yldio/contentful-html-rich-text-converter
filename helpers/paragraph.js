@@ -1,5 +1,16 @@
 const R = require('ramda');
 
+const processSubNodes = (subNodes, nodeType) => {
+    if (!["bold", "italics"].contains(nodeType)) {
+        return subNodes;
+    }
+
+    return subNodes.map((subNode) => ({
+        ...subNode,
+        marks: [{type: nodeType}]
+    }));
+}
+
 const paragraph = (subContent, nodeType) => {
     let subNodes = [];
     if (!subContent.length) {
@@ -11,6 +22,7 @@ const paragraph = (subContent, nodeType) => {
         }]];
     } else {
         subNodes = [subContent];
+
         let brIndex = R.findIndex(R.propEq('nodeType', 'br'), R.last(subNodes));
 
         while(brIndex !== -1) {
@@ -25,8 +37,8 @@ const paragraph = (subContent, nodeType) => {
     newData = R.map((content) => ({
         data: {},
         content,
-        nodeType,
-    }), subNodes);
+        nodeType: ["bold", "italic"].contains(nodeType) ? "text" : nodeType,
+    }), processSubNodes(subNodes, nodeType));
 
     return newData;
 };
