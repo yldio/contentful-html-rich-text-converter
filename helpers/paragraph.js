@@ -1,6 +1,6 @@
 const R = require('ramda');
 
-const processSubNodes = (subNodes, nodeType) => {
+/* const processSubNodes = (subNodes, nodeType) => {
     if (!["bold", "italics"].contains(nodeType)) {
         return subNodes;
     }
@@ -9,7 +9,7 @@ const processSubNodes = (subNodes, nodeType) => {
         ...subNode,
         marks: [{type: nodeType}]
     }));
-}
+} */
 
 const paragraph = (subContent, nodeType) => {
     let subNodes = [];
