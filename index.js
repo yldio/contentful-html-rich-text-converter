@@ -30,8 +30,16 @@ const htmlAttrs = {
 };
 
 const invalidNodeTypes = ['bold', 'italic'];
+const listTypes = ['unordered-list', 'ordered-list'];
 
 let transformed = []; //What should come out in the end
+
+// Enforces that child nodes of lists must be list items.
+const enforceValidContent = (parentType, content) => {
+    if (!listTypes.includes(parentType)) return content;
+
+    return content.filter(listItem => listItem.nodeType === 'list-item');
+}
 
 const transformDom = (dom) => {
     let results = [];
@@ -157,6 +165,8 @@ const transformDom = (dom) => {
                     if (!htmlAttrs[type][name]) {
                         console.log('*** new data needed under -', type, name);
                     }
+
+                    content = enforceValidContent(htmlAttrs[type][name], content);
 
                     newData = {
                         data: {},
