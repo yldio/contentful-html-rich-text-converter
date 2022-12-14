@@ -36,9 +36,11 @@ let transformed = []; //What should come out in the end
 
 // Enforces that child nodes of lists must be list items.
 const enforceValidContent = (parentType, content) => {
-    if (!listTypes.includes(parentType)) return content;
-
-    return content.filter(listItem => listItem.nodeType === 'list-item');
+    if (listTypes.includes(parentType)) {
+        return content.filter(listItem => listItem.nodeType === 'list-item');
+    } else if ('document' === parentType) {
+        return content.filter(item => !(item.type === 'paragraph' && item.content.length === 0));
+    }
 }
 
 const transformDom = (dom) => {
