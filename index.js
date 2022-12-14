@@ -34,12 +34,19 @@ const listTypes = ['unordered-list', 'ordered-list'];
 
 let transformed = []; //What should come out in the end
 
-// Enforces that child nodes of lists must be list items.
+// Detects empty paragraphs for removal
+const isEmptyParagraph = (paragraph) => {
+    return !paragraph.content
+        || paragraph.content.length === 0
+        || (paragraph.content.length === 1 && !paragraph.content[0].nodeType);
+}
+
+// Enforces that content adheres to Contentful rich text format.
 const enforceValidContent = (parentType, content) => {
     if (listTypes.includes(parentType)) {
         return content.filter(listItem => listItem.nodeType === 'list-item');
-    } else if ('document' === parentType) {
-        return content.filter(item => !(item.type === 'paragraph' && item.content.length === 0));
+    } else if (parentType === 'document') {
+        return content.filter(item => !(item.type === 'paragraph' && isEmptyParagraph(item)));
     }
 }
 
