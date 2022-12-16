@@ -179,8 +179,8 @@ const transformDom = (dom, parents = []) => {
                         }
                     }, content);
 
-                    if (content[content.length - 1].nodeType === 'br') {
-                        content = content.slice(0, 1);
+                    if (newContent[newContent.length - 1].nodeType === 'br') {
+                        newContent = newContent.slice(0, 1);
                     }
 
                     newData = {
