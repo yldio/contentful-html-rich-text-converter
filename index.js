@@ -93,7 +93,8 @@ const transformDom = (dom) => {
                             target: {
                                 sys: {
                                     space: {},
-                                    type: 'Asset',
+                                    type: 'Link',
+                                    linkType: 'Asset',
                                     createdAt: '',
                                     updatedAt: '',
                                     environment: {},
