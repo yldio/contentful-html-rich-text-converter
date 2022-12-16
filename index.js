@@ -52,7 +52,7 @@ const enforceValidContent = (parentType, content) => {
 
 const enforceTopLevelParagraphs = (content) => {
     return content.map(node => {
-        if (node.nodeType === 'hyperlink') {
+        if (node.nodeType === 'hyperlink' || node.nodeType === 'br') {
             return {
                 data: {},
                 content: [node],
@@ -178,6 +178,10 @@ const transformDom = (dom, parents = []) => {
                             newContent = R.append(node, newContent);
                         }
                     }, content);
+
+                    if (content[content.length - 1].nodeType === 'br') {
+                        content = content.slice(0, 1);
+                    }
 
                     newData = {
                         data: {},
