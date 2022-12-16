@@ -143,7 +143,7 @@ htmlTest(
 );
 htmlTest(
     '<p>Next</p><ul><li>Open</li><li>is: <strong>${gateway}</strong></li><li>verify.<br /><strong>-c 3 ${gateway}</strong></li></ul><p><img alt="Screenshot" data-entity-type="file" data-entity-uuid="bb" height="246" src="/sites/default/Test.png" width="485" /></p><ul><li>If contact <u><a href="mailto:Support@test.org">Support@test.org</a></u> assistance.</li></ul>',
-    '<p>Next</p><ul><li><p>Open</p></li><li><p>is: <b>${gateway}</b></p></li><li><p>verify.</p><p><b>-c 3 ${gateway}</b></p></li></ul><p><img src="/sites/default/Test.png" height="246" width="485" alt="Screenshot"/></p><ul><li><p>If contact <a href="mailto:Support@test.org"><u>Support@test.org</u></a> assistance.</p></li></ul>'
+    '<p>Next</p><ul><li><p>Open</p></li><li><p>is: <b>${gateway}</b></p></li><li><p>verify.</p><p><b>-c 3 ${gateway}</b></p></li></ul><p></p><img src="/sites/default/Test.png" height="246" width="485" alt="Screenshot"/><ul><li><p>If contact <a href="mailto:Support@test.org"><u>Support@test.org</u></a> assistance.</p></li></ul>'
 );
 htmlTest(
     '<ul><li>Ping.<br /><strong>ping</strong> test</li></ul>',
@@ -152,6 +152,10 @@ htmlTest(
 htmlTest(
     '<em>Test</em>',
     '<i>Test</i>'
+);
+htmlTest(
+    '<p>Aaaa<img src="abc.jpg" />Bbb</p>',
+    '<p>Aaaa</p><img src="abc.jpg" height="NaN" width="NaN" alt="undefined"/><p>Bbb</p>'
 );
 //not working
 //console.log(htmlTest('<ul><li><a>Ping.<br /><strong>ping</strong> test</a></li></ul>', '<ul><li><a>Ping.<br /><strong>ping</strong> test</a></li></ul>'));

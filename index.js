@@ -168,8 +168,9 @@ const transformDom = (dom) => {
                 case 'h4':
                 case 'h5':
                 case 'h6':
-                    newData = paragraph(content, htmlAttrs[type][name])
-                    break
+                    newData = paragraph(content, htmlAttrs[type][name]);
+
+                    break;
                 default:
                     if (!htmlAttrs[type][name]) {
                         console.log('*** new data needed under -', type, name);
