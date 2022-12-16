@@ -157,5 +157,9 @@ htmlTest(
     '<p>Aaaa<img src="abc.jpg" />Bbb</p>',
     '<p>Aaaa</p><img src="abc.jpg" height="NaN" width="NaN" alt="undefined"/><p>Bbb</p>'
 );
+htmlTest(
+    '<a href="https://bbc.co.uk">BBC</a>',
+    '<p><a href="https://bbc.co.uk">BBC</a></p>'
+);
 //not working
 //console.log(htmlTest('<ul><li><a>Ping.<br /><strong>ping</strong> test</a></li></ul>', '<ul><li><a>Ping.<br /><strong>ping</strong> test</a></li></ul>'));

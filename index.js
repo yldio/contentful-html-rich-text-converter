@@ -50,6 +50,20 @@ const enforceValidContent = (parentType, content) => {
     }
 }
 
+const enforceTopLevelParagraphs = (content) => {
+    return content.map(node => {
+        if (node.nodeType === 'hyperlink') {
+            return {
+                data: {},
+                content: [node],
+                nodeType: 'paragraph'
+            };
+        }
+
+        return node;
+    });
+}
+
 const transformDom = (dom) => {
     let results = [];
 
@@ -59,7 +73,7 @@ const transformDom = (dom) => {
         let content = [];
         let newData = {};
         if (children) {
-            content = transformDom(children);
+            content = transformDom(children, htmlAttrs[type][name]);
         }
 
         if (type === 'text') {
@@ -136,6 +150,7 @@ const transformDom = (dom) => {
                         content,
                         nodeType: htmlAttrs[type][name],
                     };
+
                     break;
                 case 'li':
                     //@TODO shouldn't need to cast to an array...
@@ -202,7 +217,7 @@ const handleFn = (error, dom) => {
     }
     transformed = {
         data: {},
-        content: transformDom(dom),
+        content: enforceTopLevelParagraphs(transformDom(dom)),
         nodeType: 'document',
     };
 };
