@@ -64,7 +64,7 @@ const enforceTopLevelParagraphs = (content) => {
     });
 }
 
-const transformDom = (dom) => {
+const transformDom = (dom, parents = []) => {
     let results = [];
 
     R.forEach((elm) => {
@@ -72,8 +72,15 @@ const transformDom = (dom) => {
         //console.log(elm);
         let content = [];
         let newData = {};
+
+        let newParents = [ ...parents, htmlAttrs[type][name] ];
+
         if (children) {
-            content = transformDom(children, htmlAttrs[type][name]);
+            content = transformDom(children, newParents);
+        }
+
+        if (!newParents.includes('paragraph') && !newParents.includes('list-item')) {
+            content = enforceTopLevelParagraphs(content);
         }
 
         if (type === 'text') {
@@ -85,6 +92,7 @@ const transformDom = (dom) => {
             };
         } else if (type === 'tag') {
             switch(name) {
+                case 'div':
                 case 'span':
                     //Spans seem to just be passed through
                     newData = content;
