@@ -48,6 +48,8 @@ const enforceValidContent = (parentType, content) => {
     } else if (parentType === 'document') {
         return content.filter(item => !(item.type === 'paragraph' && isEmptyParagraph(item)));
     }
+
+    return content;
 }
 
 const enforceTopLevelParagraphs = (content) => {
