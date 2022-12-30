@@ -1,6 +1,6 @@
 const htmlParser = require('htmlparser');
 const R = require('ramda');
-const { paragraph, styles } = require('./helpers');
+const { paragraph, styles, decodeHtmlEntities } = require('./helpers');
 const htmlAttrs = {
     tag: {
         ul: 'unordered-list',
@@ -75,6 +75,8 @@ const transformDom = (dom, parents = []) => {
         let content = [];
         let newData = {};
 
+        let decodedData = decodeHtmlEntities(data);
+
         let newParents = [ ...parents, htmlAttrs[type][name] ];
 
         if (children) {
@@ -89,7 +91,7 @@ const transformDom = (dom, parents = []) => {
             newData = {
                 data: {},
                 marks: [],
-                value: data,
+                value: decodedData,
                 nodeType: type,
             };
         } else if (type === 'tag') {

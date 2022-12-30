@@ -33,6 +33,24 @@ const compare = (transformed, richText, html, extension = [], json) => {
     return equal;
 };
 
+const { decodeHtmlEntities } = require('../helpers');
+
+const testHelperFn = (input, expected, name) => {
+    const processed = decodeHtmlEntities(input);
+
+    const res = expected === processed;
+    const color = res ? "\x1b[42m" : "\x1b[41m";
+    const status = res ? '✓' : '×';
+    console.log(color, status, "\x1b[0m", name);
+}
+
+testHelperFn('', '', 'decode empty string');
+testHelperFn(null, null, 'decode null');
+testHelperFn(undefined, undefined, 'decode undefined');
+testHelperFn(1234, 1234, 'decode number');
+testHelperFn('&nbsp;', ' ', 'decode &nbsp;');
+testHelperFn('&amp;', '&', 'decode &amp;');
+
 const { parseHtml } = require('../index');
 const { documentToHtmlString } = require('@contentful/rich-text-html-renderer');
 const { BLOCKS } = require('@contentful/rich-text-types');
@@ -160,6 +178,14 @@ htmlTest(
 htmlTest(
     '<div><em><a href="https://bbc.co.uk">BBC</a></em></div>',
     '<p><a href="https://bbc.co.uk"><i>BBC</i></a></p>'
+);
+htmlTest(
+    '<p>&nbsp;</p>',
+    '<p> </p>'
+);
+htmlTest(
+    '<p>&amp;</p>',
+    '<p>&amp;</p>'
 );
 //not working
 //console.log(htmlTest('<ul><li><a>Ping.<br /><strong>ping</strong> test</a></li></ul>', '<ul><li><a>Ping.<br /><strong>ping</strong> test</a></li></ul>'));
