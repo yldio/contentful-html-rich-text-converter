@@ -5,7 +5,7 @@
   "homepage": "https://github.com/sethimcclaine/contentful-html-rich-text-converter",
   "main": "index.js",
   "scripts": {
-      "test": "node tests/index.test.js"
+    "test": "node tests/index.test.js"
   },
   "repository": {
     "type": "git",
@@ -21,7 +21,7 @@
   "author": "Seth I. McClaine",
   "license": "ISC",
   "dependencies": {
-    "html-entities": "^1.2.1",
+    "html-entities": "1.2.1",
     "htmlparser": "^1.7.7",
     "ramda": "^0.26.1"
   },
