@@ -1,6 +1,7 @@
 const htmlParser = require('htmlparser');
 const R = require('ramda');
-const { paragraph, styles, decodeHtmlEntities } = require('./helpers');
+const mime = require('mime-types');
+const { paragraph, styles, decodeHtmlEntities, hashCode } = require('./helpers');
 const htmlAttrs = {
     tag: {
         ul: 'unordered-list',
@@ -33,6 +34,7 @@ const invalidNodeTypes = ['bold', 'italic'];
 const listTypes = ['unordered-list', 'ordered-list'];
 
 let transformed = []; //What should come out in the end
+let parsedAssets = [];
 
 // Detects empty paragraphs for removal
 const isEmptyParagraph = (paragraph) => {
@@ -64,6 +66,64 @@ const enforceTopLevelParagraphs = (content) => {
 
         return node;
     });
+}
+
+/**
+ * Produces a list of assets from a block of HTML.
+ *
+ * These are intended to be used with 'contentful-management' library.
+ *
+ * Example:
+ *
+ * client
+ *   .getSpace(SPACE_ID)
+ *   .then((space) => space.getEnvironment(ENVIRONMENT_ID))
+ *   .then((environment) => {
+ *     assets = parseAssetsFromDom(dom);
+ *
+ *     R.forEach((asset) => {
+ *       environment
+ *         .createAssetWithId(asset['description']['en-US'], asset)
+ *         .then((createdAsset) => createdAsset.processForAllLocales());
+ *     }, assets)
+ *   });
+ */
+const parseAssetsFromDom = (dom) => {
+    let assets = [];
+
+    R.forEach((elem) => {
+        const { type, name, data, attribs, children } = elem;
+
+        if (children) {
+            assets = assets.concat(parseAssetsFromDom(children));
+        }
+
+        if (type === 'tag' && name === 'img') {
+            const url = attribs.src;
+            const fileName = R.last(R.split('/', url));
+
+            assets = [
+                ...assets,
+                {
+                    title: {
+                        'en-US': attribs.alt ?? 'Image',
+                    },
+                    file: {
+                        'en-US': {
+                            contentType: mime.lookup(fileName),
+                            fileName: fileName,
+                            upload: url,
+                        }
+                    },
+                    description: {
+                        'en-US': hashCode(url).toString(),
+                    },
+                }
+            ];
+        }
+    }, dom);
+
+    return assets;
 }
 
 const transformDom = (dom, parents = []) => {
@@ -112,36 +172,16 @@ const transformDom = (dom, parents = []) => {
                     }, content);
                     break;
                 case 'img':
-                    const fileName = R.last(R.split('/', attribs.src));
+                    const url = attribs.src;
+                    const fileName = R.last(R.split('/', url));
 
                     newData = {
                         data: {
                             target: {
                                 sys: {
-                                    space: {},
                                     type: 'Link',
                                     linkType: 'Asset',
-                                    createdAt: '',
-                                    updatedAt: '',
-                                    environment: {},
-                                    revision: null,
-                                    locale: 'en-US',
-                                },
-                                fields: {
-                                    title: R.head(R.split('.', fileName)),
-                                    description: attribs.alt,
-                                    file: {
-                                        url: attribs.src,
-                                        details: {
-                                            size: 46234, //@TODO - don't hardcode
-                                            image: {
-                                                width: parseInt(attribs.width, 10),
-                                                height: parseInt(attribs.height, 10),
-                                            },
-                                        },
-                                        fileName,
-                                        contentType: 'image/' + R.last(R.split('.', fileName)),
-                                    },
+                                    id: hashCode(url).toString(),
                                 },
                             },
                         },
@@ -221,8 +261,9 @@ const transformDom = (dom, parents = []) => {
             console.log('***new type needed -', type, data);
         }
 
-
-        results = R.type(newData) === 'Array' ? R.concat(results, newData) : R.append(newData, results);
+        results = R.type(newData) === 'Array' ?
+            R.concat(results, newData) :
+            R.append(newData, results);
     }, dom);
     return results;
 };
@@ -245,6 +286,22 @@ const parseHtml = (html) => {
     return transformed;
 };
 
+const assetsFn = (error, dom) => {
+    if (error) {
+        throw error;
+    }
+
+    parsedAssets = parseAssetsFromDom(dom);
+};
+
+const assetParser = new htmlParser.Parser(new htmlParser.DefaultHandler(assetsFn));
+
+const parseAssets = (html) => {
+    assetParser.parseComplete(html);
+    return parsedAssets;
+}
+
 module.exports = {
     parseHtml,
+    parseAssets,
 };

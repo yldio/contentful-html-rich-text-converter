@@ -23,6 +23,7 @@
   "dependencies": {
     "html-entities": "1.2.1",
     "htmlparser": "^1.7.7",
+    "mime-types": "^2.1.35",
     "ramda": "^0.26.1"
   },
   "devDependencies": {
