@@ -33,10 +33,19 @@ const compare = (transformed, richText, html, extension = [], json) => {
     return equal;
 };
 
-const { decodeHtmlEntities } = require('../helpers');
+const { hashCode, decodeHtmlEntities } = require('../helpers');
 
 const testHelperFn = (input, expected, name) => {
     const processed = decodeHtmlEntities(input);
+
+    const res = expected === processed;
+    const color = res ? "\x1b[42m" : "\x1b[41m";
+    const status = res ? '✓' : '×';
+    console.log(color, status, "\x1b[0m", name);
+}
+
+const testHashCodeFn = (input, expected, name) => {
+    const processed = hashCode(input);
 
     const res = expected === processed;
     const color = res ? "\x1b[42m" : "\x1b[41m";
@@ -51,7 +60,10 @@ testHelperFn(1234, 1234, 'decode number');
 testHelperFn('&nbsp;', ' ', 'decode &nbsp;');
 testHelperFn('&amp;', '&', 'decode &amp;');
 
-const { parseHtml } = require('../index');
+testHashCodeFn('', 0, 'hashcode for empty string');
+testHashCodeFn('Hello', 69609650, 'hashcode for hello');
+
+const { parseHtml, parseAssets } = require('../index');
 const { documentToHtmlString } = require('@contentful/rich-text-html-renderer');
 const { BLOCKS } = require('@contentful/rich-text-types');
 
@@ -143,9 +155,35 @@ const htmlTest = (html, testHtml, log = false) => {
         console.log("\x1b[31m", `- ${testHtml}`);
         console.log("\x1b[32m", `+ ${newHtml}`);
     }
-
 }
 
+const parseTest = (html, expected, title) => {
+    const doc = parseHtml(html);
+    const result = JSON.stringify(doc) === JSON.stringify(expected);
+
+    const color = result ? "\x1b[42m" : "\x1b[41m";
+    const status = result ? '✓' : '×';
+    console.log(color, status, "\x1b[0m", `assetTest: ${title}`);
+
+    if (result === false) {
+        console.log("\x1b[31m", `- ${JSON.stringify(expected)}`);
+        console.log("\x1b[32m", `+ ${JSON.stringify(doc)}`);
+    }
+}
+
+const assetTest = (html, expected, title) => {
+    const assets = parseAssets(html);
+    const result = JSON.stringify(assets) === JSON.stringify(expected);
+
+    const color = result ? "\x1b[42m" : "\x1b[41m";
+    const status = result ? '✓' : '×';
+    console.log(color, status, "\x1b[0m", `parseTest: ${title}`);
+
+    if (result === false) {
+        console.log("\x1b[31m", `- ${JSON.stringify(expected)}`);
+        console.log("\x1b[32m", `+ ${JSON.stringify(assets)}`);
+    }
+}
 
 htmlTest(
     '<ul><li><span><span>Do not</span></span></li><li><span><span>You must work.</span></span></li><li><span><span>You may need to risk software.</span></span></li></ul>',
@@ -156,8 +194,8 @@ htmlTest(
     '<ul><li><p><a href="https://example.com">A link in a list item.</a></p></li></ul>'
 )
 htmlTest(
-    '<p>Next</p><ul><li>Open</li><li>is: <strong>${gateway}</strong></li><li>verify.<br /><strong>-c 3 ${gateway}</strong></li></ul><p><img alt="Screenshot" data-entity-type="file" data-entity-uuid="bb" height="246" src="/sites/default/Test.png" width="485" /></p><ul><li>If contact <u><a href="mailto:Support@test.org">Support@test.org</a></u> assistance.</li></ul>',
-    '<p>Next</p><ul><li><p>Open</p></li><li><p>is: <b>${gateway}</b></p></li><li><p>verify.</p><p><b>-c 3 ${gateway}</b></p></li></ul><p></p><img src="/sites/default/Test.png" height="246" width="485" alt="Screenshot"/><ul><li><p>If contact <a href="mailto:Support@test.org"><u>Support@test.org</u></a> assistance.</p></li></ul>'
+    '<p>Next</p><ul><li>Open</li><li>is: <strong>${gateway}</strong></li><li>verify.<br /><strong>-c 3 ${gateway}</strong></li></ul><p></p><ul><li>If contact <u><a href="mailto:Support@test.org">Support@test.org</a></u> assistance.</li></ul>',
+    '<p>Next</p><ul><li><p>Open</p></li><li><p>is: <b>${gateway}</b></p></li><li><p>verify.</p><p><b>-c 3 ${gateway}</b></p></li></ul><p></p><ul><li><p>If contact <a href="mailto:Support@test.org"><u>Support@test.org</u></a> assistance.</p></li></ul>'
 );
 htmlTest(
     '<ul><li>Ping.<br /><strong>ping</strong> test</li></ul>',
@@ -166,10 +204,6 @@ htmlTest(
 htmlTest(
     '<em>Test</em>',
     '<i>Test</i>'
-);
-htmlTest(
-    '<p>Aaaa<img src="abc.jpg" />Bbb</p>',
-    '<p>Aaaa</p><img src="abc.jpg" height="NaN" width="NaN" alt="undefined"/><p>Bbb</p>'
 );
 htmlTest(
     '<a href="https://bbc.co.uk">BBC</a>',
@@ -189,3 +223,117 @@ htmlTest(
 );
 //not working
 //console.log(htmlTest('<ul><li><a>Ping.<br /><strong>ping</strong> test</a></li></ul>', '<ul><li><a>Ping.<br /><strong>ping</strong> test</a></li></ul>'));
+
+assetTest(
+    '<p>&amp;</p>',
+    [],
+    'No images to parse.'
+);
+
+assetTest(
+    '<img src="https://example.com/example.jpg">',
+    [
+        {
+            title: { 'en-US': 'Image' },
+            file: {
+                'en-US': {
+                    contentType: 'image/jpeg',
+                    fileName: 'example.jpg',
+                    upload: 'https://example.com/example.jpg'
+                }
+            },
+            description: { 'en-US': '1002443364' }
+        }
+    ],
+    'JPG image alone.'
+);
+
+assetTest(
+    '<img src="https://example.com/example.jpeg">',
+    [
+        {
+            title: { 'en-US': 'Image' },
+            file: {
+                'en-US': {
+                    contentType: 'image/jpeg',
+                    fileName: 'example.jpeg',
+                    upload: 'https://example.com/example.jpeg'
+                }
+            },
+            description: { 'en-US': '1010973171' }
+        }
+    ],
+    'JPG image alone (alternative "JPEG" extension).'
+);
+
+
+assetTest(
+    '<img src="https://example.com/example.png">',
+    [
+        {
+            title: { 'en-US': 'Image' },
+            file: {
+                'en-US': {
+                    contentType: 'image/png',
+                    fileName: 'example.png',
+                    upload: 'https://example.com/example.png'
+                }
+            },
+            description: { 'en-US': '1002437660' }
+        }
+    ],
+    'PNG image alone.'
+);
+
+assetTest(
+    '<p><img src="https://example.com/example.png"></p><p><i><img src="https://example.com/example.jpg"></i></p>',
+    [
+        {
+            title: { 'en-US': 'Image' },
+            file: {
+                'en-US': {
+                    contentType: 'image/png',
+                    fileName: 'example.png',
+                    upload: 'https://example.com/example.png'
+                }
+            },
+            description: { 'en-US': '1002437660' }
+        },
+        {
+            title: { 'en-US': 'Image' },
+            file: {
+                'en-US': {
+                    contentType: 'image/jpeg',
+                    fileName: 'example.jpg',
+                    upload: 'https://example.com/example.jpg'
+                }
+            },
+            description: { 'en-US': '1002443364' }
+        }
+    ],
+    'Multiple images in complex DOM.'
+);
+
+parseTest(
+    '<img src="https://example.com/example.jpg">',
+    {
+        "data": {},
+        "content": [
+            {
+                "data": {
+                    "target": {
+                        "sys": {
+                            "type": "Link",
+                            "linkType": "Asset",
+                            "id": "1002443364"
+                        }
+                    }
+                },
+                "content": [],
+                "nodeType": "embedded-asset-block"
+            }
+        ],
+        "nodeType":"document"
+    },
+    'Single JPEG image.'
+);
