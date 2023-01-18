@@ -1,7 +1,12 @@
 const htmlParser = require('htmlparser');
 const R = require('ramda');
 const mime = require('mime-types');
-const { paragraph, styles, decodeHtmlEntities, hashCode } = require('./helpers');
+const {
+    paragraph,
+    styles,
+    decodeHtmlEntities,
+    hashCode,
+} = require('./helpers');
 const htmlAttrs = {
     tag: {
         ul: 'unordered-list',
@@ -38,55 +43,45 @@ let parsedAssets = [];
 
 // Detects empty paragraphs for removal
 const isEmptyParagraph = (paragraph) => {
-    return !paragraph.content
-        || paragraph.content.length === 0
-        || (paragraph.content.length === 1 && !paragraph.content[0].nodeType);
-}
+    return (
+        !paragraph.content ||
+        paragraph.content.length === 0 ||
+        (paragraph.content.length === 1 && !paragraph.content[0].nodeType)
+    );
+};
 
 // Enforces that content adheres to Contentful rich text format.
 const enforceValidContent = (parentType, content) => {
     if (listTypes.includes(parentType)) {
-        return content.filter(listItem => listItem.nodeType === 'list-item');
+        return content.filter((listItem) => listItem.nodeType === 'list-item');
     } else if (parentType === 'document') {
-        return content.filter(item => !(item.type === 'paragraph' && isEmptyParagraph(item)));
+        return content.filter(
+            (item) => !(item.type === 'paragraph' && isEmptyParagraph(item))
+        );
     }
 
     return content;
-}
+};
 
 const enforceTopLevelParagraphs = (content) => {
-    return content.map(node => {
+    return content.map((node) => {
         if (node.nodeType === 'hyperlink' || node.nodeType === 'br') {
             return {
                 data: {},
                 content: [node],
-                nodeType: 'paragraph'
+                nodeType: 'paragraph',
             };
         }
 
         return node;
     });
-}
+};
 
 /**
  * Produces a list of assets from a block of HTML.
  *
  * These are intended to be used with 'contentful-management' library.
  *
- * Example:
- *
- * client
- *   .getSpace(SPACE_ID)
- *   .then((space) => space.getEnvironment(ENVIRONMENT_ID))
- *   .then((environment) => {
- *     assets = parseAssetsFromDom(dom);
- *
- *     R.forEach((asset) => {
- *       environment
- *         .createAssetWithId(asset['description']['en-US'], asset)
- *         .then((createdAsset) => createdAsset.processForAllLocales());
- *     }, assets)
- *   });
  */
 const parseAssetsFromDom = (dom) => {
     let assets = [];
@@ -101,49 +96,71 @@ const parseAssetsFromDom = (dom) => {
         if (type === 'tag' && name === 'img') {
             const url = attribs.src;
             const fileName = R.last(R.split('/', url));
+            const assetId = getAssetId(url);
+
+            const assetDescription = attribs?.alt
+                ? {
+                      description: {
+                          'en-US': attribs.alt,
+                      },
+                  }
+                : {};
 
             assets = [
                 ...assets,
-                {
-                    title: {
-                        'en-US': attribs.alt ?? 'Image',
+                [
+                    assetId,
+                    {
+                        fields: {
+                            title: {
+                                'en-US': fileName,
+                            },
+                            file: {
+                                'en-US': {
+                                    contentType: mime.lookup(fileName),
+                                    fileName: fileName,
+                                    upload: url,
+                                },
+                            },
+                            ...assetDescription,
+                        },
                     },
-                    file: {
-                        'en-US': {
-                            contentType: mime.lookup(fileName),
-                            fileName: fileName,
-                            upload: url,
-                        }
-                    },
-                    description: {
-                        'en-US': hashCode(url).toString(),
-                    },
-                }
+                ],
             ];
         }
     }, dom);
 
     return assets;
-}
+};
+
+const getAssetId = (url) => {
+    const regex =
+        /https:\/\/cloud\.squidex\.io\/api\/assets\/.*\/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\/.*/i;
+    const regexMatch = regex.exec(url);
+    return regexMatch?.length ? regexMatch[1] : hashCode(url).toString();
+};
 
 const transformDom = (dom, parents = []) => {
     let results = [];
 
     R.forEach((elm) => {
         const { type, name, data, attribs, children } = elm;
-        //console.log(elm);
+
         let content = [];
         let newData = {};
 
         let decodedData = decodeHtmlEntities(data);
 
-        let newParents = [ ...parents, htmlAttrs[type][name] ];
+        let newParents = [...parents, htmlAttrs[type][name]];
 
         if (children) {
             content = transformDom(children, newParents);
         }
 
-        if (!newParents.includes('paragraph') && !newParents.includes('list-item')) {
+        if (
+            !newParents.includes('paragraph') &&
+            !newParents.includes('list-item')
+        ) {
             content = enforceTopLevelParagraphs(content);
         }
 
@@ -155,7 +172,7 @@ const transformDom = (dom, parents = []) => {
                 nodeType: type,
             };
         } else if (type === 'tag') {
-            switch(name) {
+            switch (name) {
                 case 'div':
                 case 'span':
                     //Spans seem to just be passed through
@@ -166,14 +183,21 @@ const transformDom = (dom, parents = []) => {
                     const entities = new Entities();
 
                     newData = R.map((node) => {
-                        node = R.assoc('value', entities.decode(node.value), node);
-                        node = R.assoc('marks', R.append({type: 'code'}, node.marks), node);
+                        node = R.assoc(
+                            'value',
+                            entities.decode(node.value),
+                            node
+                        );
+                        node = R.assoc(
+                            'marks',
+                            R.append({ type: 'code' }, node.marks),
+                            node
+                        );
                         return node;
                     }, content);
                     break;
                 case 'img':
                     const url = attribs.src;
-                    const fileName = R.last(R.split('/', url));
 
                     newData = {
                         data: {
@@ -181,14 +205,14 @@ const transformDom = (dom, parents = []) => {
                                 sys: {
                                     type: 'Link',
                                     linkType: 'Asset',
-                                    id: hashCode(url).toString(),
+                                    id: getAssetId(url),
                                 },
                             },
                         },
                         content: [],
                         nodeType: htmlAttrs[type][name],
                     };
-                    break
+                    break;
                 case 'i':
                 case 'em':
                 case 'b':
@@ -210,14 +234,28 @@ const transformDom = (dom, parents = []) => {
                     let newContent = [];
 
                     //Seems to want text wrapped in some type of content tag (p, h*, etc)
-                    content = R.forEach((node)=> {
-                        if (node.nodeType === 'text' || node.nodeType === 'hyperlink') {
+                    content = R.forEach((node) => {
+                        if (
+                            node.nodeType === 'text' ||
+                            node.nodeType === 'hyperlink'
+                        ) {
                             //if the last of new content isn't a `paragraph`
-                            if (R.propOr(false, 'nodeType', R.last(newContent)) !== 'paragraph') {
-                                newContent = R.concat(newContent, paragraph([], 'paragraph'));
+                            if (
+                                R.propOr(
+                                    false,
+                                    'nodeType',
+                                    R.last(newContent)
+                                ) !== 'paragraph'
+                            ) {
+                                newContent = R.concat(
+                                    newContent,
+                                    paragraph([], 'paragraph')
+                                );
                             }
                             //put node in R.last(newContent).content
-                            newContent[newContent.length - 1].content.push(node);
+                            newContent[newContent.length - 1].content.push(
+                                node
+                            );
                         } else {
                             newContent = R.append(node, newContent);
                         }
@@ -248,12 +286,19 @@ const transformDom = (dom, parents = []) => {
                         console.log('*** new data needed under -', type, name);
                     }
 
-                    content = enforceValidContent(htmlAttrs[type][name], content);
+                    content = enforceValidContent(
+                        htmlAttrs[type][name],
+                        content
+                    );
 
                     newData = {
                         data: {},
                         content,
-                        nodeType: invalidNodeTypes.includes(htmlAttrs[type][name]) ? "paragraph" : htmlAttrs[type][name],
+                        nodeType: invalidNodeTypes.includes(
+                            htmlAttrs[type][name]
+                        )
+                            ? 'paragraph'
+                            : htmlAttrs[type][name],
                     };
                     break;
             }
@@ -261,9 +306,10 @@ const transformDom = (dom, parents = []) => {
             console.log('***new type needed -', type, data);
         }
 
-        results = R.type(newData) === 'Array' ?
-            R.concat(results, newData) :
-            R.append(newData, results);
+        results =
+            R.type(newData) === 'Array'
+                ? R.concat(results, newData)
+                : R.append(newData, results);
     }, dom);
     return results;
 };
@@ -294,12 +340,14 @@ const assetsFn = (error, dom) => {
     parsedAssets = parseAssetsFromDom(dom);
 };
 
-const assetParser = new htmlParser.Parser(new htmlParser.DefaultHandler(assetsFn));
+const assetParser = new htmlParser.Parser(
+    new htmlParser.DefaultHandler(assetsFn)
+);
 
 const parseAssets = (html) => {
     assetParser.parseComplete(html);
     return parsedAssets;
-}
+};
 
 module.exports = {
     parseHtml,

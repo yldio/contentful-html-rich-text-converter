@@ -1,6 +1,6 @@
 const R = require('ramda');
 
-const nl = (content) => process.stdout.write('\n'+content+'\n');
+const nl = (content) => process.stdout.write('\n' + content + '\n');
 
 /**
  * compare original contentful data to generated data
@@ -39,19 +39,19 @@ const testHelperFn = (input, expected, name) => {
     const processed = decodeHtmlEntities(input);
 
     const res = expected === processed;
-    const color = res ? "\x1b[42m" : "\x1b[41m";
+    const color = res ? '\x1b[42m' : '\x1b[41m';
     const status = res ? '✓' : '×';
-    console.log(color, status, "\x1b[0m", name);
-}
+    console.log(color, status, '\x1b[0m', name);
+};
 
 const testHashCodeFn = (input, expected, name) => {
     const processed = hashCode(input);
 
     const res = expected === processed;
-    const color = res ? "\x1b[42m" : "\x1b[41m";
+    const color = res ? '\x1b[42m' : '\x1b[41m';
     const status = res ? '✓' : '×';
-    console.log(color, status, "\x1b[0m", name);
-}
+    console.log(color, status, '\x1b[0m', name);
+};
 
 testHelperFn('', '', 'decode empty string');
 testHelperFn(null, null, 'decode null');
@@ -73,7 +73,11 @@ const { BLOCKS } = require('@contentful/rich-text-types');
 const runTest = (richText, extension = [], json) => {
     const options = {
         renderNode: {
-            [BLOCKS.EMBEDDED_ASSET]: ({ data: { target: { fields }}}) =>
+            [BLOCKS.EMBEDDED_ASSET]: ({
+                data: {
+                    target: { fields },
+                },
+            }) =>
                 `<img src="${fields.file.url}" height="${fields.file.details.image.height}" width="${fields.file.details.image.width}" alt="${fields.description}"/>`,
         },
     };
@@ -102,11 +106,11 @@ getContentfulContent();
 /*/
 const printRes = (title, file) => {
     const res = runTest(require(file));
-    const color = res ? "\x1b[42m" : "\x1b[41m";
+    const color = res ? '\x1b[42m' : '\x1b[41m';
     const status = res ? '✓' : '×';
 
-    console.log(color, status, "\x1b[0m", title); //valid
-}
+    console.log(color, status, '\x1b[0m', title); //valid
+};
 //*
 //https://jsonformatter.org/
 printRes('Bold, Italic, Underline', './boldItalicUnderline.json');
@@ -127,12 +131,16 @@ const htmlTest = (html, testHtml, log = false) => {
     const json = parseHtml(html);
     const options = {
         renderNode: {
-            [BLOCKS.EMBEDDED_ASSET]: ({ data: { target: { fields }}}) =>
+            [BLOCKS.EMBEDDED_ASSET]: ({
+                data: {
+                    target: { fields },
+                },
+            }) =>
                 `<img src="${fields.file.url}" height="${fields.file.details.image.height}" width="${fields.file.details.image.width}" alt="${fields.description}"/>`,
         },
     };
     const newHtml = documentToHtmlString(json, options);
-    if(log) {
+    if (log) {
         nl('** Original **');
         console.log(html);
 
@@ -147,43 +155,43 @@ const htmlTest = (html, testHtml, log = false) => {
     }
 
     const res = testHtml === newHtml;
-    const color = res ? "\x1b[42m" : "\x1b[41m";
+    const color = res ? '\x1b[42m' : '\x1b[41m';
     const status = res ? '✓' : '×';
-    console.log(color, status, "\x1b[0m", 'htmlTest'); //valid
+    console.log(color, status, '\x1b[0m', 'htmlTest'); //valid
 
     if (res === false) {
-        console.log("\x1b[31m", `- ${testHtml}`);
-        console.log("\x1b[32m", `+ ${newHtml}`);
+        console.log('\x1b[31m', `- ${testHtml}`);
+        console.log('\x1b[32m', `+ ${newHtml}`);
     }
-}
+};
 
 const parseTest = (html, expected, title) => {
     const doc = parseHtml(html);
     const result = JSON.stringify(doc) === JSON.stringify(expected);
 
-    const color = result ? "\x1b[42m" : "\x1b[41m";
+    const color = result ? '\x1b[42m' : '\x1b[41m';
     const status = result ? '✓' : '×';
-    console.log(color, status, "\x1b[0m", `assetTest: ${title}`);
+    console.log(color, status, '\x1b[0m', `assetTest: ${title}`);
 
     if (result === false) {
-        console.log("\x1b[31m", `- ${JSON.stringify(expected)}`);
-        console.log("\x1b[32m", `+ ${JSON.stringify(doc)}`);
+        console.log('\x1b[31m', `- ${JSON.stringify(expected)}`);
+        console.log('\x1b[32m', `+ ${JSON.stringify(doc)}`);
     }
-}
+};
 
 const assetTest = (html, expected, title) => {
     const assets = parseAssets(html);
     const result = JSON.stringify(assets) === JSON.stringify(expected);
 
-    const color = result ? "\x1b[42m" : "\x1b[41m";
+    const color = result ? '\x1b[42m' : '\x1b[41m';
     const status = result ? '✓' : '×';
-    console.log(color, status, "\x1b[0m", `parseTest: ${title}`);
+    console.log(color, status, '\x1b[0m', `parseTest: ${title}`);
 
     if (result === false) {
-        console.log("\x1b[31m", `- ${JSON.stringify(expected)}`);
-        console.log("\x1b[32m", `+ ${JSON.stringify(assets)}`);
+        console.log('\x1b[31m', `- ${JSON.stringify(expected)}`);
+        console.log('\x1b[32m', `+ ${JSON.stringify(assets)}`);
     }
-}
+};
 
 htmlTest(
     '<ul><li><span><span>Do not</span></span></li><li><span><span>You must work.</span></span></li><li><span><span>You may need to risk software.</span></span></li></ul>',
@@ -192,7 +200,7 @@ htmlTest(
 htmlTest(
     '<ul><li><a href="https://example.com">A link in a list item.</a></li></ul>',
     '<ul><li><p><a href="https://example.com">A link in a list item.</a></p></li></ul>'
-)
+);
 htmlTest(
     '<p>Next</p><ul><li>Open</li><li>is: <strong>${gateway}</strong></li><li>verify.<br /><strong>-c 3 ${gateway}</strong></li></ul><p></p><ul><li>If contact <u><a href="mailto:Support@test.org">Support@test.org</a></u> assistance.</li></ul>',
     '<p>Next</p><ul><li><p>Open</p></li><li><p>is: <b>${gateway}</b></p></li><li><p>verify.</p><p><b>-c 3 ${gateway}</b></p></li></ul><p></p><ul><li><p>If contact <a href="mailto:Support@test.org"><u>Support@test.org</u></a> assistance.</p></li></ul>'
@@ -201,10 +209,7 @@ htmlTest(
     '<ul><li>Ping.<br /><strong>ping</strong> test</li></ul>',
     '<ul><li><p>Ping.</p><p><b>ping</b> test</p></li></ul>'
 );
-htmlTest(
-    '<em>Test</em>',
-    '<i>Test</i>'
-);
+htmlTest('<em>Test</em>', '<i>Test</i>');
 htmlTest(
     '<a href="https://bbc.co.uk">BBC</a>',
     '<p><a href="https://bbc.co.uk">BBC</a></p>'
@@ -213,103 +218,118 @@ htmlTest(
     '<div><em><a href="https://bbc.co.uk">BBC</a></em></div>',
     '<p><a href="https://bbc.co.uk"><i>BBC</i></a></p>'
 );
-htmlTest(
-    '<p>&nbsp;</p>',
-    '<p> </p>'
-);
-htmlTest(
-    '<p>&amp;</p>',
-    '<p>&amp;</p>'
-);
+htmlTest('<p>&nbsp;</p>', '<p> </p>');
+htmlTest('<p>&amp;</p>', '<p>&amp;</p>');
 //not working
 //console.log(htmlTest('<ul><li><a>Ping.<br /><strong>ping</strong> test</a></li></ul>', '<ul><li><a>Ping.<br /><strong>ping</strong> test</a></li></ul>'));
 
-assetTest(
-    '<p>&amp;</p>',
-    [],
-    'No images to parse.'
-);
+const assetId = '8ca5d37d-4bc1-4085-b05e-786c3e6f5a38';
+const squidexAssetUrlSuffix = 'https://cloud.squidex.io/api/assets/crn-100';
+
+assetTest('<p>&amp;</p>', [], 'No images to parse.');
 
 assetTest(
-    '<img src="https://example.com/example.jpg">',
+    `<img src=${squidexAssetUrlSuffix}/${assetId}/example.jpg>`,
     [
-        {
-            title: { 'en-US': 'Image' },
-            file: {
-                'en-US': {
-                    contentType: 'image/jpeg',
-                    fileName: 'example.jpg',
-                    upload: 'https://example.com/example.jpg'
-                }
+        [
+            assetId,
+            {
+                fields: {
+                    title: { 'en-US': 'example.jpg' },
+                    file: {
+                        'en-US': {
+                            contentType: 'image/jpeg',
+                            fileName: 'example.jpg',
+                            upload: `${squidexAssetUrlSuffix}/${assetId}/example.jpg`,
+                        },
+                    },
+                },
             },
-            description: { 'en-US': '1002443364' }
-        }
+        ],
     ],
     'JPG image alone.'
 );
 
 assetTest(
-    '<img src="https://example.com/example.jpeg">',
+    `<img src="${squidexAssetUrlSuffix}/${assetId}/example.jpeg">`,
     [
-        {
-            title: { 'en-US': 'Image' },
-            file: {
-                'en-US': {
-                    contentType: 'image/jpeg',
-                    fileName: 'example.jpeg',
-                    upload: 'https://example.com/example.jpeg'
-                }
+        [
+            assetId,
+            {
+                fields: {
+                    title: { 'en-US': 'example.jpeg' },
+                    file: {
+                        'en-US': {
+                            contentType: 'image/jpeg',
+                            fileName: 'example.jpeg',
+                            upload: `${squidexAssetUrlSuffix}/${assetId}/example.jpeg`,
+                        },
+                    },
+                },
             },
-            description: { 'en-US': '1010973171' }
-        }
+        ],
     ],
     'JPG image alone (alternative "JPEG" extension).'
 );
 
-
 assetTest(
-    '<img src="https://example.com/example.png">',
+    `<img src=${squidexAssetUrlSuffix}/${assetId}/example.png>`,
     [
-        {
-            title: { 'en-US': 'Image' },
-            file: {
-                'en-US': {
-                    contentType: 'image/png',
-                    fileName: 'example.png',
-                    upload: 'https://example.com/example.png'
-                }
+        [
+            assetId,
+            {
+                fields: {
+                    title: { 'en-US': 'example.png' },
+                    file: {
+                        'en-US': {
+                            contentType: 'image/png',
+                            fileName: 'example.png',
+                            upload: `${squidexAssetUrlSuffix}/${assetId}/example.png`,
+                        },
+                    },
+                },
             },
-            description: { 'en-US': '1002437660' }
-        }
+        ],
     ],
     'PNG image alone.'
 );
 
+const anotherAssetId = '1f5925a1-f446-4502-9e88-f714e8da8b8a';
 assetTest(
-    '<p><img src="https://example.com/example.png"></p><p><i><img src="https://example.com/example.jpg"></i></p>',
+    `<p><img src=${squidexAssetUrlSuffix}/${assetId}/image1.jpg alt="A beautiful image"></p><p><i><img src=${squidexAssetUrlSuffix}/${anotherAssetId}/image2.png alt="Awesome image"></i></p>`,
     [
-        {
-            title: { 'en-US': 'Image' },
-            file: {
-                'en-US': {
-                    contentType: 'image/png',
-                    fileName: 'example.png',
-                    upload: 'https://example.com/example.png'
-                }
+        [
+            assetId,
+            {
+                fields: {
+                    title: { 'en-US': 'image1.jpg' },
+                    file: {
+                        'en-US': {
+                            contentType: 'image/jpeg',
+                            fileName: 'image1.jpg',
+                            upload: `${squidexAssetUrlSuffix}/${assetId}/image1.jpg`,
+                        },
+                    },
+                    description: { 'en-US': 'A beautiful image' },
+                },
             },
-            description: { 'en-US': '1002437660' }
-        },
-        {
-            title: { 'en-US': 'Image' },
-            file: {
-                'en-US': {
-                    contentType: 'image/jpeg',
-                    fileName: 'example.jpg',
-                    upload: 'https://example.com/example.jpg'
-                }
+        ],
+        [
+            anotherAssetId,
+            {
+                fields: {
+                    title: { 'en-US': 'image2.png' },
+                    file: {
+                        'en-US': {
+                            contentType: 'image/png',
+                            fileName: 'image2.png',
+                            upload: `${squidexAssetUrlSuffix}/${anotherAssetId}/image2.png`,
+                        },
+                    },
+                    description: { 'en-US': 'Awesome image' },
+                },
             },
-            description: { 'en-US': '1002443364' }
-        }
+        ],
     ],
     'Multiple images in complex DOM.'
 );
@@ -317,23 +337,23 @@ assetTest(
 parseTest(
     '<img src="https://example.com/example.jpg">',
     {
-        "data": {},
-        "content": [
+        data: {},
+        content: [
             {
-                "data": {
-                    "target": {
-                        "sys": {
-                            "type": "Link",
-                            "linkType": "Asset",
-                            "id": "1002443364"
-                        }
-                    }
+                data: {
+                    target: {
+                        sys: {
+                            type: 'Link',
+                            linkType: 'Asset',
+                            id: '1002443364',
+                        },
+                    },
                 },
-                "content": [],
-                "nodeType": "embedded-asset-block"
-            }
+                content: [],
+                nodeType: 'embedded-asset-block',
+            },
         ],
-        "nodeType":"document"
+        nodeType: 'document',
     },
     'Single JPEG image.'
 );
