@@ -83,7 +83,7 @@ const enforceTopLevelParagraphs = (content) => {
  * These are intended to be used with 'contentful-management' library.
  *
  */
-const parseAssetsFromDom = (dom) => {
+const parseAssetsFromDom = (dom, getAssetId) => {
     let assets = [];
 
     R.forEach((elem) => {
@@ -96,7 +96,9 @@ const parseAssetsFromDom = (dom) => {
         if (type === 'tag' && name === 'img') {
             const url = attribs.src;
             const fileName = R.last(R.split('/', url));
-            const assetId = getAssetId(url);
+            const assetId = getAssetId
+                ? getAssetId(url)
+                : hashCode(url).toString();
 
             const assetDescription = attribs?.alt
                 ? {
@@ -133,14 +135,7 @@ const parseAssetsFromDom = (dom) => {
     return assets;
 };
 
-const getAssetId = (url) => {
-    const regex =
-        /https:\/\/cloud\.squidex\.io\/api\/assets\/.*\/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\/.*/i;
-    const regexMatch = regex.exec(url);
-    return regexMatch?.length ? regexMatch[1] : hashCode(url).toString();
-};
-
-const transformDom = (dom, parents = []) => {
+const transformDom = (dom, parents = [], getAssetId) => {
     let results = [];
 
     R.forEach((elm) => {
@@ -205,7 +200,9 @@ const transformDom = (dom, parents = []) => {
                                 sys: {
                                     type: 'Link',
                                     linkType: 'Asset',
-                                    id: getAssetId(url),
+                                    id: getAssetId
+                                        ? getAssetId(url)
+                                        : hashCode(url).toString(),
                                 },
                             },
                         },
@@ -314,37 +311,43 @@ const transformDom = (dom, parents = []) => {
     return results;
 };
 
-const handleFn = (error, dom) => {
-    if (error) {
-        throw error;
-    }
-    transformed = {
-        data: {},
-        content: enforceTopLevelParagraphs(transformDom(dom)),
-        nodeType: 'document',
+const parseHtml = (html, getAssetId) => {
+    console.log('*** parseHtml', getAssetId);
+    const handleFn = (error, dom) => {
+        if (error) {
+            throw error;
+        }
+        transformed = {
+            data: {},
+            content: enforceTopLevelParagraphs(
+                transformDom(dom, [], getAssetId)
+            ),
+            nodeType: 'document',
+        };
     };
-};
 
-const parser = new htmlParser.Parser(new htmlParser.DefaultHandler(handleFn));
+    const parser = new htmlParser.Parser(
+        new htmlParser.DefaultHandler(handleFn)
+    );
 
-const parseHtml = (html) => {
     parser.parseComplete(html); //returns undefined...
     return transformed;
 };
 
-const assetsFn = (error, dom) => {
-    if (error) {
-        throw error;
-    }
+const parseAssets = (html, getAssetId) => {
+    console.log('*** parseAssets', getAssetId);
+    const assetsFn = (error, dom) => {
+        if (error) {
+            throw error;
+        }
 
-    parsedAssets = parseAssetsFromDom(dom);
-};
+        parsedAssets = parseAssetsFromDom(dom, getAssetId);
+    };
 
-const assetParser = new htmlParser.Parser(
-    new htmlParser.DefaultHandler(assetsFn)
-);
+    const assetParser = new htmlParser.Parser(
+        new htmlParser.DefaultHandler(assetsFn)
+    );
 
-const parseAssets = (html) => {
     assetParser.parseComplete(html);
     return parsedAssets;
 };
