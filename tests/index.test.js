@@ -101,7 +101,6 @@ const getContentfulContent = () => {
         throw e;
     });
 };
-
 getContentfulContent();
 /*/
 const printRes = (title, file) => {
@@ -223,16 +222,13 @@ htmlTest('<p>&amp;</p>', '<p>&amp;</p>');
 //not working
 //console.log(htmlTest('<ul><li><a>Ping.<br /><strong>ping</strong> test</a></li></ul>', '<ul><li><a>Ping.<br /><strong>ping</strong> test</a></li></ul>'));
 
-const assetId = '8ca5d37d-4bc1-4085-b05e-786c3e6f5a38';
-const squidexAssetUrlSuffix = 'https://cloud.squidex.io/api/assets/crn-100';
-
 assetTest('<p>&amp;</p>', [], 'No images to parse.');
 
 assetTest(
-    `<img src=${squidexAssetUrlSuffix}/${assetId}/example.jpg>`,
+    '<img src="https://example.com/example.jpg">',
     [
         [
-            assetId,
+            '1002443364',
             {
                 fields: {
                     title: { 'en-US': 'example.jpg' },
@@ -240,7 +236,7 @@ assetTest(
                         'en-US': {
                             contentType: 'image/jpeg',
                             fileName: 'example.jpg',
-                            upload: `${squidexAssetUrlSuffix}/${assetId}/example.jpg`,
+                            upload: 'https://example.com/example.jpg',
                         },
                     },
                 },
@@ -251,10 +247,10 @@ assetTest(
 );
 
 assetTest(
-    `<img src="${squidexAssetUrlSuffix}/${assetId}/example.jpeg">`,
+    '<img src="https://example.com/example.jpeg">',
     [
         [
-            assetId,
+            '1010973171',
             {
                 fields: {
                     title: { 'en-US': 'example.jpeg' },
@@ -262,7 +258,7 @@ assetTest(
                         'en-US': {
                             contentType: 'image/jpeg',
                             fileName: 'example.jpeg',
-                            upload: `${squidexAssetUrlSuffix}/${assetId}/example.jpeg`,
+                            upload: 'https://example.com/example.jpeg',
                         },
                     },
                 },
@@ -273,10 +269,10 @@ assetTest(
 );
 
 assetTest(
-    `<img src=${squidexAssetUrlSuffix}/${assetId}/example.png>`,
+    '<img src="https://example.com/example.png">',
     [
         [
-            assetId,
+            '1002437660',
             {
                 fields: {
                     title: { 'en-US': 'example.png' },
@@ -284,7 +280,7 @@ assetTest(
                         'en-US': {
                             contentType: 'image/png',
                             fileName: 'example.png',
-                            upload: `${squidexAssetUrlSuffix}/${assetId}/example.png`,
+                            upload: 'https://example.com/example.png',
                         },
                     },
                 },
@@ -294,39 +290,36 @@ assetTest(
     'PNG image alone.'
 );
 
-const anotherAssetId = '1f5925a1-f446-4502-9e88-f714e8da8b8a';
 assetTest(
-    `<p><img src=${squidexAssetUrlSuffix}/${assetId}/image1.jpg alt="A beautiful image"></p><p><i><img src=${squidexAssetUrlSuffix}/${anotherAssetId}/image2.png alt="Awesome image"></i></p>`,
+    '<p><img src="https://example.com/example.png"></p><p><i><img src="https://example.com/example.jpg"></i></p>',
     [
         [
-            assetId,
+            '1002437660',
             {
                 fields: {
-                    title: { 'en-US': 'image1.jpg' },
+                    title: { 'en-US': 'example.png' },
                     file: {
                         'en-US': {
-                            contentType: 'image/jpeg',
-                            fileName: 'image1.jpg',
-                            upload: `${squidexAssetUrlSuffix}/${assetId}/image1.jpg`,
+                            contentType: 'image/png',
+                            fileName: 'example.png',
+                            upload: 'https://example.com/example.png',
                         },
                     },
-                    description: { 'en-US': 'A beautiful image' },
                 },
             },
         ],
         [
-            anotherAssetId,
+            '1002443364',
             {
                 fields: {
-                    title: { 'en-US': 'image2.png' },
+                    title: { 'en-US': 'example.jpg' },
                     file: {
                         'en-US': {
-                            contentType: 'image/png',
-                            fileName: 'image2.png',
-                            upload: `${squidexAssetUrlSuffix}/${anotherAssetId}/image2.png`,
+                            contentType: 'image/jpeg',
+                            fileName: 'example.jpg',
+                            upload: 'https://example.com/example.jpg',
                         },
                     },
-                    description: { 'en-US': 'Awesome image' },
                 },
             },
         ],
