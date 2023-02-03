@@ -29,6 +29,7 @@ const htmlAttrs = {
         i: 'italic',
         em: 'italic',
         u: 'underline',
+        iframe: 'embedded-entry-inline',
         img: 'embedded-asset-block',
         span: 'text',
     },
@@ -85,7 +86,6 @@ const enforceTopLevelParagraphs = (content) => {
  */
 const parseAssetsFromDom = (dom, getAssetId) => {
     let assets = [];
-
     R.forEach((elem) => {
         const { type, name, data, attribs, children } = elem;
 
@@ -133,6 +133,38 @@ const parseAssetsFromDom = (dom, getAssetId) => {
     }, dom);
 
     return assets;
+};
+
+const parseIFramesFromDom = (dom) => {
+    let iFrames = [];
+    R.forEach((elem) => {
+        const { type, name, data, attribs, children } = elem;
+
+        if (children) {
+            iFrames = iFrames.concat(parseIFramesFromDom(children));
+        }
+
+        if (type === 'tag' && name === 'iframe') {
+            const url = attribs.src;
+            const mediaId = hashCode(url).toString();
+
+            iFrames = [
+                ...iFrames,
+                [
+                    mediaId,
+                    {
+                        fields: {
+                            url: {
+                                'en-US': url,
+                            },
+                        },
+                    },
+                ],
+            ];
+        }
+    }, dom);
+
+    return iFrames;
 };
 
 const transformDom = (dom, parents = [], getAssetId) => {
@@ -203,6 +235,24 @@ const transformDom = (dom, parents = [], getAssetId) => {
                                     id: getAssetId
                                         ? getAssetId(url)
                                         : hashCode(url).toString(),
+                                },
+                            },
+                        },
+                        content: [],
+                        nodeType: htmlAttrs[type][name],
+                    };
+                    break;
+                case 'iframe':
+                    const mediaURL = attribs.src;
+                    const mediaId = hashCode(mediaURL).toString();
+
+                    newData = {
+                        data: {
+                            target: {
+                                sys: {
+                                    type: 'Link',
+                                    linkType: 'Entry',
+                                    id: mediaId,
                                 },
                             },
                         },
@@ -312,7 +362,6 @@ const transformDom = (dom, parents = [], getAssetId) => {
 };
 
 const parseHtml = (html, getAssetId) => {
-    console.log('*** parseHtml', getAssetId);
     const handleFn = (error, dom) => {
         if (error) {
             throw error;
@@ -335,7 +384,6 @@ const parseHtml = (html, getAssetId) => {
 };
 
 const parseAssets = (html, getAssetId) => {
-    console.log('*** parseAssets', getAssetId);
     const assetsFn = (error, dom) => {
         if (error) {
             throw error;
@@ -352,7 +400,23 @@ const parseAssets = (html, getAssetId) => {
     return parsedAssets;
 };
 
+const parseIFrames = (html) => {
+    const iFramesParser = new htmlParser.Parser(
+        new htmlParser.DefaultHandler((error, dom) => {
+            if (error) {
+                throw error;
+            }
+
+            parsedIFrames = parseIFramesFromDom(dom);
+        })
+    );
+
+    iFramesParser.parseComplete(html);
+    return parsedIFrames;
+};
+
 module.exports = {
     parseHtml,
     parseAssets,
+    parseIFrames,
 };
