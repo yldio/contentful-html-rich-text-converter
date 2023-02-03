@@ -350,3 +350,78 @@ parseTest(
     },
     'Single JPEG image.'
 );
+
+parseTest(
+    '<iframe src="https://vimeo.com/video">',
+    {
+        data: {},
+        content: [
+            {
+                data: {
+                    target: {
+                        sys: {
+                            type: 'Link',
+                            linkType: 'Entry',
+                            id: '1564116844',
+                        },
+                    },
+                },
+                content: [],
+                nodeType: 'embedded-entry-inline',
+            },
+        ],
+        nodeType: 'document',
+    },
+    'Single iframe'
+);
+
+parseTest(
+    '<p>Video <iframe src="https://vimeo.com/video"></p><p>PDF <iframe src="https://drive.com/file"></p>',
+    {
+        data: {},
+        content: [
+            {
+                data: {},
+                content: [
+                    { data: {}, marks: [], value: 'Video ', nodeType: 'text' },
+                    {
+                        data: {
+                            target: {
+                                sys: {
+                                    type: 'Link',
+                                    linkType: 'Entry',
+                                    id: '1564116844',
+                                },
+                            },
+                        },
+                        content: [],
+                        nodeType: 'embedded-entry-inline',
+                    },
+                ],
+                nodeType: 'paragraph',
+            },
+            {
+                data: {},
+                content: [
+                    { data: {}, marks: [], value: 'PDF ', nodeType: 'text' },
+                    {
+                        data: {
+                            target: {
+                                sys: {
+                                    type: 'Link',
+                                    linkType: 'Entry',
+                                    id: '523299395',
+                                },
+                            },
+                        },
+                        content: [],
+                        nodeType: 'embedded-entry-inline',
+                    },
+                ],
+                nodeType: 'paragraph',
+            },
+        ],
+        nodeType: 'document',
+    },
+    'Multiple iframes'
+);
