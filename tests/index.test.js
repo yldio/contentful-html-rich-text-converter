@@ -219,6 +219,9 @@ htmlTest(
 );
 htmlTest('<p>&nbsp;</p>', '<p> </p>');
 htmlTest('<p>&amp;</p>', '<p>&amp;</p>');
+
+htmlTest('<a href="https://example.com">A br in a link.<br></a>', '<p><a href="https://example.com">A br in a link.</a></p>');
+
 //not working
 //console.log(htmlTest('<ul><li><a>Ping.<br /><strong>ping</strong> test</a></li></ul>', '<ul><li><a>Ping.<br /><strong>ping</strong> test</a></li></ul>'));
 
