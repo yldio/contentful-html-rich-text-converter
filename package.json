@@ -27,7 +27,7 @@
     "ramda": "^0.26.1"
   },
   "devDependencies": {
-    "@contentful/rich-text-html-renderer": "^13.0.0",
+    "@contentful/rich-text-html-renderer": "^16.0.2",
     "contentful": "^7.1.0",
     "contentful-migration": "^0.16.6",
     "isomorphic-fetch": "^2.2.1"

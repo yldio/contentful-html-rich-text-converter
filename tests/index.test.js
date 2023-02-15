@@ -219,6 +219,8 @@ htmlTest(
 );
 htmlTest('<p>&nbsp;</p>', '<p> </p>');
 htmlTest('<p>&amp;</p>', '<p>&amp;</p>');
+htmlTest('<sub>test</sub>', '<sub>test</sub>');
+htmlTest('<sup>test</sup>', '<sup>test</sup>');
 //not working
 //console.log(htmlTest('<ul><li><a>Ping.<br /><strong>ping</strong> test</a></li></ul>', '<ul><li><a>Ping.<br /><strong>ping</strong> test</a></li></ul>'));
 
