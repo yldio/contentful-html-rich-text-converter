@@ -25,6 +25,8 @@ const htmlAttrs = {
         a: 'hyperlink',
         b: 'bold',
         strong: 'bold',
+        sup: 'superscript',
+        sub: 'subscript',
         code: 'text',
         i: 'italic',
         em: 'italic',
@@ -264,6 +266,8 @@ const transformDom = (dom, parents = [], getAssetId) => {
                 case 'em':
                 case 'b':
                 case 'strong':
+                case 'sup':
+                case 'sub':
                 case 'u':
                     newData = styles(content, htmlAttrs[type][name]);
                     break;
