@@ -37,7 +37,6 @@ const { hashCode, decodeHtmlEntities } = require('../helpers');
 
 const testHelperFn = (input, expected, name) => {
     const processed = decodeHtmlEntities(input);
-
     const res = expected === processed;
     const color = res ? '\x1b[42m' : '\x1b[41m';
     const status = res ? '✓' : '×';
@@ -57,7 +56,7 @@ testHelperFn('', '', 'decode empty string');
 testHelperFn(null, null, 'decode null');
 testHelperFn(undefined, undefined, 'decode undefined');
 testHelperFn(1234, 1234, 'decode number');
-testHelperFn('&nbsp;', ' ', 'decode &nbsp;');
+testHelperFn('&nbsp;', ' ', 'decode &nbsp;');
 testHelperFn('&amp;', '&', 'decode &amp;');
 
 testHashCodeFn('', 0, 'hashcode for empty string');
@@ -164,6 +163,19 @@ const htmlTest = (html, testHtml, log = false) => {
     }
 };
 
+const jsonTest = (html, expectedJson) => {
+    const json = parseHtml(html);
+    const res = JSON.stringify(json) === JSON.stringify(expectedJson);
+    const color = res ? '\x1b[42m' : '\x1b[41m';
+    const status = res ? '✓' : '×';
+    console.log(color, status, '\x1b[0m', 'jsonTest'); //valid
+
+    if (res === false) {
+        console.log('\x1b[31m', `- ${html}`);
+        console.log('\x1b[32m', `+ ${JSON.stringify(json, null, 2)}`);
+    }
+}
+
 const parseTest = (html, expected, title) => {
     const doc = parseHtml(html);
     const result = JSON.stringify(doc) === JSON.stringify(expected);
@@ -217,10 +229,30 @@ htmlTest(
     '<div><em><a href="https://bbc.co.uk">BBC</a></em></div>',
     '<p><a href="https://bbc.co.uk"><i>BBC</i></a></p>'
 );
-htmlTest('<p>&nbsp;</p>', '<p> </p>');
+htmlTest('<p>&nbsp;test&nbsp;</p>', '<p> test </p>');
+htmlTest('<p>&raquo;</p>', '<p>»</p>');
+// Ampersand is escaped in JSON but converted back to html entity in html
 htmlTest('<p>&amp;</p>', '<p>&amp;</p>');
 htmlTest('<sub>test</sub>', '<sub>test</sub>');
 htmlTest('<sup>test</sup>', '<sup>test</sup>');
+jsonTest('<p>&amp;</p>', {
+    data: {},
+    content: [
+      {
+        data: {},
+        content: [
+          {
+            data: {},
+            marks: [],
+            value: "&",
+            nodeType: "text",
+          },
+        ],
+        nodeType: "paragraph",
+      },
+    ],
+    nodeType: "document",
+});
 //not working
 //console.log(htmlTest('<ul><li><a>Ping.<br /><strong>ping</strong> test</a></li></ul>', '<ul><li><a>Ping.<br /><strong>ping</strong> test</a></li></ul>'));
 

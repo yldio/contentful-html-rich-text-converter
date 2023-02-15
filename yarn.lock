@@ -428,10 +428,10 @@
   "resolved" "https://registry.npmjs.org/hosted-git-info/-/hosted-git-info-2.7.1.tgz"
   "version" "2.7.1"
 
-"html-entities@1.2.1":
-  "integrity" "sha1-DfKTUfByEWNRXfueVUPl9u7VFi8="
-  "resolved" "https://registry.npmjs.org/html-entities/-/html-entities-1.2.1.tgz"
-  "version" "1.2.1"
+"html-entities@2.3.3":
+  "integrity" "sha512-DV5Ln36z34NNTDgnz0EWGBLZENelNAtkiFA4kyNOG2tDI6Mz1uSWiq1wAKdyjnJwyDiDO7Fa2SO1CTxPXL8VxA=="
+  "resolved" "https://registry.npmjs.org/html-entities/-/html-entities-2.3.3.tgz"
+  "version" "2.3.3"
 
 "htmlparser@^1.7.7":
   "integrity" "sha1-GeezmX/2+6yZrlp9J2ZInv5+LQ4="
