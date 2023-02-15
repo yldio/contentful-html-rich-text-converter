@@ -208,13 +208,12 @@ const transformDom = (dom, parents = [], getAssetId) => {
                     newData = content;
                     break;
                 case 'code':
-                    const Entities = require('html-entities').XmlEntities;
-                    const entities = new Entities();
+                    const { decode } = require('html-entities');
 
                     newData = R.map((node) => {
                         node = R.assoc(
                             'value',
-                            entities.decode(node.value),
+                            decode(node.value, { level: 'xml' }),
                             node
                         );
                         node = R.assoc(
