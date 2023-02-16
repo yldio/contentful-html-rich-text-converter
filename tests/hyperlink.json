@@ -1,26 +1,26 @@
 {
-  "data": {},
-  "content": [
-    {
-      "data": {},
-      "content": [
+    "data": {},
+    "content": [
         {
-          "data": {
-            "uri": "http://www.aol.com"
-          },
-          "content": [
-            {
-              "data": {},
-              "marks": [],
-              "value": "asdf",
-              "nodeType": "text"
-            }
-          ],
-          "nodeType": "hyperlink"
+            "data": {},
+            "content": [
+                {
+                    "data": {
+                        "uri": "http://www.aol.com"
+                    },
+                    "content": [
+                        {
+                            "data": {},
+                            "marks": [],
+                            "value": "asdf",
+                            "nodeType": "text"
+                        }
+                    ],
+                    "nodeType": "hyperlink"
+                }
+            ],
+            "nodeType": "paragraph"
         }
-      ],
-      "nodeType": "paragraph"
-    }
-  ],
-  "nodeType": "document"
+    ],
+    "nodeType": "document"
 }

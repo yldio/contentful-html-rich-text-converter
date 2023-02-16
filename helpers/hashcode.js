@@ -14,11 +14,11 @@ const hashCode = (string) => {
 
     if (len > hash) {
         while (i < len) {
-            hash = (hash << 5) - hash + string.charCodeAt(i++) | 0;
+            hash = ((hash << 5) - hash + string.charCodeAt(i++)) | 0;
         }
     }
 
     return hash > 0 ? hash : 0 - hash;
-}
+};
 
 module.exports = hashCode;

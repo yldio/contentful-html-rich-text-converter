@@ -1,10 +1,10 @@
-const R = require('ramda');
+const R = require("ramda");
 
-const invalidNodeTypes = ['bold', 'italic'];
-const invalidChildNodeTypes = ['embedded-asset-block'];
+const invalidNodeTypes = ["bold", "italic"];
+const invalidChildNodeTypes = ["embedded-asset-block"];
 
 const breakOutInvalidChildren = (newData) => {
-    if (!newData.content || !newData.nodeType === 'paragraph') return newData;
+    if (!newData.content || !newData.nodeType === "paragraph") return newData;
 
     const brokenUp = newData.content.reduce(
         (acc, entry) => {
@@ -12,26 +12,23 @@ const breakOutInvalidChildren = (newData) => {
                 return {
                     nodes: [...acc.nodes, entry],
                     currentIndex: acc.currentIndex + 1,
-                    indexIsParagraph: false
+                    indexIsParagraph: false,
                 };
             } else if (acc.indexIsParagraph === false) {
                 const newNodes = [
                     ...acc.nodes,
-                    {...newData, content: [entry]}
+                    { ...newData, content: [entry] },
                 ];
 
                 return {
                     nodes: newNodes,
                     currentIndex: acc.currentIndex + 1,
-                    indexIsParagraph: true
+                    indexIsParagraph: true,
                 };
             } else {
                 const replaceNode = {
                     ...acc.nodes[acc.currentIndex],
-                    content: [
-                        ...acc.nodes[acc.currentIndex].content,
-                        entry
-                    ]
+                    content: [...acc.nodes[acc.currentIndex].content, entry],
                 };
 
                 acc.nodes[acc.currentIndex] = replaceNode;
@@ -40,49 +37,53 @@ const breakOutInvalidChildren = (newData) => {
             }
         },
         {
-            nodes: [{...newData, content: []}],
+            nodes: [{ ...newData, content: [] }],
             currentIndex: 0,
-            indexIsParagraph: true
+            indexIsParagraph: true,
         }
     );
 
     return brokenUp.nodes.length === 1 ? brokenUp.nodes[0] : brokenUp.nodes;
-}
-
-
+};
 
 const paragraph = (subContent, nodeType) => {
     let subNodes = [];
     if (!subContent.length) {
-        subNodes = [[{
-            data: {},
-            marks: [],
-            value: '',
-            nodeType: 'text',
-        }]];
+        subNodes = [
+            [
+                {
+                    data: {},
+                    marks: [],
+                    value: "",
+                    nodeType: "text",
+                },
+            ],
+        ];
     } else {
         subNodes = [subContent];
-        let brIndex = R.findIndex(R.propEq('nodeType', 'br'), R.last(subNodes));
+        let brIndex = R.findIndex(R.propEq("nodeType", "br"), R.last(subNodes));
 
-        while(brIndex !== -1) {
+        while (brIndex !== -1) {
             const last = subNodes.pop();
 
             const split = R.splitAt(brIndex, last);
-            split[1].shift();//remove the br node
+            split[1].shift(); //remove the br node
             subNodes = R.concat(subNodes, split);
-            brIndex = R.findIndex(R.propEq('nodeType', 'br'), R.last(subNodes));
+            brIndex = R.findIndex(R.propEq("nodeType", "br"), R.last(subNodes));
         }
     }
-    newData = R
-        .map((content) => ({
+    newData = R.map(
+        (content) => ({
             data: {},
             content,
-            nodeType: invalidNodeTypes.includes(nodeType) ? "paragraph" : nodeType,
-        }), subNodes);
+            nodeType: invalidNodeTypes.includes(nodeType)
+                ? "paragraph"
+                : nodeType,
+        }),
+        subNodes
+    );
 
-    newData = newData
-        .map(breakOutInvalidChildren)
-        .flat();
+    newData = newData.map(breakOutInvalidChildren).flat();
 
     return newData;
 };

@@ -1,22 +1,22 @@
 {
-  "data": {},
-  "content": [
-    {
-      "data": {},
-      "content": [
+    "data": {},
+    "content": [
         {
-          "data": {},
-          "marks": [
-            {
-              "type": "code"
-            }
-          ],
-          "value": "<a href=\"www.aol.com\"></a>",
-          "nodeType": "text"
+            "data": {},
+            "content": [
+                {
+                    "data": {},
+                    "marks": [
+                        {
+                            "type": "code"
+                        }
+                    ],
+                    "value": "<a href=\"www.aol.com\"></a>",
+                    "nodeType": "text"
+                }
+            ],
+            "nodeType": "paragraph"
         }
-      ],
-      "nodeType": "paragraph"
-    }
-  ],
-  "nodeType": "document"
+    ],
+    "nodeType": "document"
 }
