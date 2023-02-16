@@ -1,35 +1,36 @@
 {
-  "name": "contentful-html-rich-text-converter",
-  "version": "1.0.9",
-  "description": "Restructure html into contentful's rich-text model",
-  "homepage": "https://github.com/sethimcclaine/contentful-html-rich-text-converter",
-  "main": "index.js",
-  "scripts": {
-    "test": "node tests/index.test.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/sethimcclaine/contentful-html-rich-text-converter"
-  },
-  "keywords": [
-    "html",
-    "richtext",
-    "contentful",
-    "converter",
-    "conversion"
-  ],
-  "author": "Seth I. McClaine",
-  "license": "ISC",
-  "dependencies": {
-    "html-entities": "2.3.3",
-    "htmlparser": "^1.7.7",
-    "mime-types": "^2.1.35",
-    "ramda": "^0.26.1"
-  },
-  "devDependencies": {
-    "@contentful/rich-text-html-renderer": "^16.0.2",
-    "contentful": "^7.1.0",
-    "contentful-migration": "^0.16.6",
-    "isomorphic-fetch": "^2.2.1"
-  }
+    "name": "contentful-html-rich-text-converter",
+    "version": "1.0.9",
+    "description": "Restructure html into contentful's rich-text model",
+    "homepage": "https://github.com/sethimcclaine/contentful-html-rich-text-converter",
+    "main": "index.js",
+    "scripts": {
+        "test": "node tests/index.test.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/sethimcclaine/contentful-html-rich-text-converter"
+    },
+    "keywords": [
+        "html",
+        "richtext",
+        "contentful",
+        "converter",
+        "conversion"
+    ],
+    "author": "Seth I. McClaine",
+    "license": "ISC",
+    "dependencies": {
+        "html-entities": "2.3.3",
+        "htmlparser": "^1.7.7",
+        "mime-types": "^2.1.35",
+        "ramda": "^0.26.1"
+    },
+    "devDependencies": {
+        "@contentful/rich-text-html-renderer": "^16.0.2",
+        "contentful": "^7.1.0",
+        "contentful-migration": "^0.16.6",
+        "isomorphic-fetch": "^2.2.1",
+        "prettier": "^2.8.4"
+    }
 }

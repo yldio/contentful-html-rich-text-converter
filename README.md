@@ -1,4 +1,5 @@
 # contentful-html-rich-text-converter
+
 This package was built to support migration of rich text into contentful
 
 **This package is currently still under development and in beta**
@@ -20,6 +21,7 @@ console.log(result);
 ```
 
 Output:
+
 ```
   {
   "data": {},
@@ -87,23 +89,24 @@ Output:
 
 ### Verified
 
-* `<ul>`
-* `<ol>`
-* `<li>`
-* `<b>`
-* `<u>`
-* `<i>`
-* `<p>`
-* `<hr>`
-* `<blockquote>`
-* `<p>`
-* `<h{1-6}>`
-* `<a>`
-* `<code>`
-* `<br />`
+-   `<ul>`
+-   `<ol>`
+-   `<li>`
+-   `<b>`
+-   `<u>`
+-   `<i>`
+-   `<p>`
+-   `<hr>`
+-   `<blockquote>`
+-   `<p>`
+-   `<h{1-6}>`
+-   `<a>`
+-   `<code>`
+-   `<br />`
 
 ### In development
-* `<img>`
+
+-   `<img>`
 
 ##Git Repository
 

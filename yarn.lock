@@ -851,6 +851,11 @@
   "resolved" "https://registry.npmjs.org/pify/-/pify-2.3.0.tgz"
   "version" "2.3.0"
 
+"prettier@^2.8.4":
+  "integrity" "sha512-vIS4Rlc2FNh0BySk3Wkd6xmwxB0FpOndW5fisM5H8hsZSxU2VWVB5CWIkIjWvrHjIhxk2g3bfMKM87zNTrZddw=="
+  "resolved" "https://registry.npmjs.org/prettier/-/prettier-2.8.4.tgz"
+  "version" "2.8.4"
+
 "pseudomap@^1.0.2":
   "integrity" "sha1-8FKijacOYYkX7wqKw0wa5aaChrM="
   "resolved" "https://registry.npmjs.org/pseudomap/-/pseudomap-1.0.2.tgz"

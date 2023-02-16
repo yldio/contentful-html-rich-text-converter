@@ -1,6 +1,6 @@
 module.exports = {
-    paragraph: require('./paragraph'),
-    styles: require('./styles'),
-    decodeHtmlEntities: require('./htmlentities'),
-    hashCode: require('./hashcode'),
+    paragraph: require("./paragraph"),
+    styles: require("./styles"),
+    decodeHtmlEntities: require("./htmlentities"),
+    hashCode: require("./hashcode"),
 };
