@@ -1,4 +1,10 @@
 const htmlParser = require("htmlparser");
+// add <wbr> to the list of empty tags (those that have no chilidren)
+htmlParser.DefaultHandler._emptyTags = {
+    ...htmlParser.DefaultHandler._emptyTags,
+    wbr: 1,
+};
+
 const R = require("ramda");
 const mime = require("mime-types");
 const {
@@ -21,7 +27,6 @@ const htmlAttrs = {
         h5: "heading-5",
         h6: "heading-6",
         hr: "hr",
-        br: "br",
         a: "hyperlink",
         b: "bold",
         strong: "bold",
@@ -206,6 +211,16 @@ const transformDom = (dom, parents = [], getAssetId) => {
                 case "span":
                     //Spans seem to just be passed through
                     newData = content;
+                    break;
+                case "wbr":
+                case "br":
+                    // line breaks are represented as a single newline character
+                    newData = {
+                        data: {},
+                        marks: [],
+                        value: "\n",
+                        nodeType: "text",
+                    };
                     break;
                 case "code":
                     const { decode } = require("html-entities");
