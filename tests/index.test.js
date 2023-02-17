@@ -149,7 +149,9 @@ const htmlTest = (html, testHtml, log = false) => {
         console.log(testHtml);
 
         nl("json");
-        console.log(R.pathOr("wrong path", ["content"], json));
+        console.log(
+            JSON.stringify(R.pathOr("wrong path", ["content"], json), null, 2)
+        );
     }
 
     const res = testHtml === newHtml;
@@ -214,11 +216,11 @@ htmlTest(
 );
 htmlTest(
     '<p>Next</p><ul><li>Open</li><li>is: <strong>${gateway}</strong></li><li>verify.<br /><strong>-c 3 ${gateway}</strong></li></ul><p></p><ul><li>If contact <u><a href="mailto:Support@test.org">Support@test.org</a></u> assistance.</li></ul>',
-    '<p>Next</p><ul><li><p>Open</p></li><li><p>is: <b>${gateway}</b></p></li><li><p>verify.</p><p><b>-c 3 ${gateway}</b></p></li></ul><p></p><ul><li><p>If contact <a href="mailto:Support@test.org"><u>Support@test.org</u></a> assistance.</p></li></ul>'
+    '<p>Next</p><ul><li><p>Open</p></li><li><p>is: <b>${gateway}</b></p></li><li><p>verify.\n<b>-c 3 ${gateway}</b></p></li></ul><p></p><ul><li><p>If contact <a href="mailto:Support@test.org"><u>Support@test.org</u></a> assistance.</p></li></ul>'
 );
 htmlTest(
     "<ul><li>Ping.<br /><strong>ping</strong> test</li></ul>",
-    "<ul><li><p>Ping.</p><p><b>ping</b> test</p></li></ul>"
+    "<ul><li><p>Ping.\n<b>ping</b> test</p></li></ul>"
 );
 htmlTest("<em>Test</em>", "<i>Test</i>");
 htmlTest(
@@ -235,6 +237,13 @@ htmlTest("<p>&raquo;</p>", "<p>»</p>");
 htmlTest("<p>&amp;</p>", "<p>&amp;</p>");
 htmlTest("<sub>test</sub>", "<sub>test</sub>");
 htmlTest("<sup>test</sup>", "<sup>test</sup>");
+htmlTest("line 1<br>line 2", "line 1\nline 2");
+htmlTest("line 1<wbr>line 2", "line 1\nline 2");
+htmlTest(
+    '<a href="https://bbc.co.uk">line1<br>line2</a>',
+    `<p><a href="https://bbc.co.uk">line1\nline2</a></p>`
+);
+
 jsonTest("<p>&amp;</p>", {
     data: {},
     content: [
