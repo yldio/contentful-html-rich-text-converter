@@ -468,3 +468,75 @@ parseTest(
     },
     "Multiple iframes"
 );
+
+[
+    {tag: 'h1', nodeType: 'heading-1'},
+    {tag: 'h2', nodeType: 'heading-2'},
+    {tag: 'h3', nodeType: 'heading-3'},
+    {tag: 'h4', nodeType: 'heading-4'},
+    {tag: 'h5', nodeType: 'heading-5'},
+    {tag: 'h6', nodeType: 'heading-6'}
+].forEach(({tag, nodeType}) => {
+    parseTest(`<${tag}><span style=\\"font-weight: 400;\\">Team Presenting: </span><strong>Team Desjardins - <a href=\\"<https://cloud.squidex.io/app/asap-hub/content/users/da7638a9-6cfb-460f-b931-2569a8947f68\\>" target=\\"_blank\\" rel=\\"noopener\\">Heidi McBride</a></strong></${tag}>`, {
+        "data": {},
+        "content": [
+            {
+                "data": {},
+                "content": [
+                    {
+                        "data": {},
+                        "marks": [],
+                        "value": "Team Presenting: ",
+                        "nodeType": "text"
+                    },
+                    {
+                        "data": {},
+                        "marks": [
+                            {
+                                "type": "bold"
+                            }
+                        ],
+                        "value": "Team Desjardins - ",
+                        "nodeType": "text"
+                    },
+                    {
+                        "data": {
+                            "uri": "\\"
+                        },
+                        "content": [
+                            {
+                                "data": {},
+                                "content": [
+                                    {
+                                        "data": {},
+                                        "marks": [
+                                            {
+                                                "type": "bold"
+                                            }
+                                        ],
+                                        "value": "\" target=\\\"_blank\\\" rel=\\\"noopener\\\"",
+                                        "nodeType": "text"
+                                    },
+                                    {
+                                        "data": {},
+                                        "marks": [
+                                            {
+                                                "type": "bold"
+                                            }
+                                        ],
+                                        "value": "Heidi McBride",
+                                        "nodeType": "text"
+                                    }
+                                ]
+                            }
+                        ],
+                        "nodeType": "hyperlink"
+                    }
+                ],
+                "nodeType": nodeType
+            }
+        ],
+        "nodeType": "document"
+    }, `hyperlink inside ${nodeType}`)
+})
+

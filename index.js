@@ -191,10 +191,18 @@ const transformDom = (dom, parents = [], getAssetId) => {
             content = transformDom(children, newParents);
         }
 
-        if (
-            !newParents.includes("paragraph") &&
-            !newParents.includes("list-item")
-        ) {
+        const topLevelElements = [
+            "paragraph",
+            "list-item",
+            "heading-1",
+            "heading-2",
+            "heading-3",
+            "heading-4",
+            "heading-5",
+            "heading-6"
+        ];
+
+        if (!topLevelElements.some(element => newParents.includes(element))) {
             content = enforceTopLevelParagraphs(content);
         }
 
